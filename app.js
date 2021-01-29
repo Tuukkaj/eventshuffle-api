@@ -4,9 +4,10 @@ require("dotenv").config({path: path.resolve(__dirname, './env/.env')});
 const eventsConnection = require("./mongodb/eventsConnection");
 eventsConnection.init();
 
-function exitHandler() {
-    console.log("Exit handler");
+const log = new (require("./logger/Logger"))("app")
 
+function exitHandler() {
+    log.log("exitHandler", "Closing connections")
     // Close future connections here
     eventsConnection.closeConnection(); 
 }
