@@ -2,10 +2,12 @@ const path = require("path");
 require("dotenv").config({path: path.resolve(__dirname, './env/.env')});
 
 const log = new (require("./logger/Logger"))("app"); 
+
 const loggerMiddleware = require("./logger/loggerMiddleware");
 const createLocMiddleware = require("./localizations/createLocalizationMiddleware");
 
 const app = require("express")();
+const bodyParser = require("body-parser"); 
 
 const port = Number(process.env.EXPRESS_PORT); 
 
@@ -30,6 +32,8 @@ function exitHandler() {
 // Exit handlers
 process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
+
+app.use(bodyParser.json());
 
 app.use(loggerMiddleware); 
 

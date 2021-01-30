@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Tuukkaj/eventshuffle-api#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "dotenv": "^8.2.0",
