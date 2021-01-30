@@ -14,10 +14,10 @@ module.exports = function Logger(fileName) {
     }
 
     this.warn = function(funcName, text) {
-        console.log(`${createInfoText("warn")}[${funcName}]: ${text}`);
+        console.warn(`${createInfoText("warn")}[${funcName}]: ${text}`);
     }
 
     this.error = function(funcName, text) {
-        console.log(`${createInfoText("error")}[${funcName}]: ${text}`);
+        console.error(`${createInfoText("error")}[${funcName}]: ${text}`);
     }
 }
