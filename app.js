@@ -29,7 +29,7 @@ function exitHandler() {
 process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
 
-async function run() {
+async function run(callback) {
     await eventsConnection.init();
 
     app.use(bodyParser.json());
@@ -43,7 +43,8 @@ async function run() {
     
     app.listen(port, function() {
         log.log("app.listen", "Express listening requests at port " + port);
-    }); 
+        callback(app);
+    });
 }
 
-run(); 
+module.exports = run;  

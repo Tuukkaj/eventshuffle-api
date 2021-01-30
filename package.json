@@ -2,9 +2,10 @@
   "name": "eventshuffle-api",
   "version": "1.0.0",
   "description": "Simplified API application for scheduling events with friends. Basically simplified doodle.com",
-  "main": "app.js",
+  "main": "start.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --recursive",
+    "start": "node start.js"
   },
   "repository": {
     "type": "git",
