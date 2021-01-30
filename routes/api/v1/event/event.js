@@ -6,8 +6,16 @@ router.get(`${eventPath}/list`, function(req, res) {
 }); 
 
 router.post(`${eventPath}`, function(req, res) {
+    const name = req.body.name; 
+    const dates = req.body.dates; 
+
+    if(!name || !Array.isArray(dates)) {
+        return res.status(404).send(req.loc.api("event_create_missing_params"));
+    }
+
     res.send("/create");
 }); 
+
 
 router.get(`${eventPath}/:eventId`, function(req, res) {
     res.send("/show event");

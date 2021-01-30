@@ -3,6 +3,7 @@ require("dotenv").config({path: path.resolve(__dirname, './env/.env')});
 
 const log = new (require("./logger/Logger"))("app"); 
 const loggerMiddleware = require("./logger/loggerMiddleware");
+const createLocMiddleware = require("./localizations/createLocalizationMiddleware");
 
 const app = require("express")();
 
@@ -31,6 +32,8 @@ process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
 
 app.use(loggerMiddleware); 
+
+app.use(createLocMiddleware()); 
 
 useApiV1(app); 
 
