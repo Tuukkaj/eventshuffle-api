@@ -6,10 +6,12 @@ const loggerMiddleware = require("./logger/loggerMiddleware");
 
 const app = require("express")();
 
-let port = Number(process.env.EXPRESS_PORT); 
+const port = Number(process.env.EXPRESS_PORT); 
 
 const eventsConnection = require("./mongodb/eventsConnection");
 eventsConnection.init();
+
+const useApiV1 = require("./routes/api/v1/useV1"); 
 
 if(!port) {
     throw new Error("EXPRESS_PORT in .env is not a number!");
@@ -30,10 +32,8 @@ process.on('SIGTERM', exitHandler);
 
 app.use(loggerMiddleware); 
 
-app.get('/', function(req, res) {
-    res.send('Hello World!')
+useApiV1(app); 
 
-});
 
 app.listen(port, function() {
     log.log("app.listen", "Express listening requests at port " + port);
