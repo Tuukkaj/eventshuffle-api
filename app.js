@@ -25,9 +25,8 @@ function exitHandler() {
 }
 
 // Exit handlers
-process.on('exit', exitHandler);
 process.on('SIGINT', exitHandler);
-process.on('uncaughtException', exitHandler);
+process.on('SIGTERM', exitHandler);
 
 app.use(loggerMiddleware); 
 
