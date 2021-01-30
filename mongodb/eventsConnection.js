@@ -1,5 +1,5 @@
 const MongoClient = require("mongodb").MongoClient; 
-const log = new (require("../logger/Logger"))("eventsConnection"); 
+const log = new (require("../logger/Logger"))("eventsConnection.js"); 
 
 let connection; 
 let clientRef; 

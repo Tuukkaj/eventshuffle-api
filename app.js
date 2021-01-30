@@ -1,7 +1,7 @@
 const path = require("path"); 
 require("dotenv").config({path: path.resolve(__dirname, './env/.env')});
 
-const log = new (require("./logger/Logger"))("app"); 
+const log = new (require("./logger/Logger"))("app.js"); 
 
 const loggerMiddleware = require("./logger/loggerMiddleware");
 const createLocMiddleware = require("./localizations/createLocalizationMiddleware");
