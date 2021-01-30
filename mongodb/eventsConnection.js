@@ -5,18 +5,25 @@ let connection;
 let clientRef; 
 
 module.exports = {
-    init() {
+    async init() {
         if(!connection) {
-            MongoClient.connect(process.env.MONGO_DB_URL, {useUnifiedTopology: true}, function(err, client) {
-                if(err !== null) {
+            try {
+                const client = await MongoClient.connect(process.env.MONGO_DB_URL, {useUnifiedTopology: true}); 
+
+                if(!client) {
                     log.error("init","Failed to connect to MongoDB"); 
-                    throw err; 
+                    throw new Error("Error: Failed to initialize eventsConnection!");  
+                    process.exit()
                 }
-            
+                
                 connection = client.db(process.env.MONGO_DB_EVENTS_DATABASE);
                 clientRef = client; 
                 log.log("init", "MongoDB connected");
-            });
+            } catch(e) {
+                log.error(e)
+                process.exit()
+            }
+            
         } else {
             throw new Error("Error: eventsConnection has been initialized already!"); 
         }

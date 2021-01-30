@@ -12,14 +12,10 @@ const bodyParser = require("body-parser");
 const port = Number(process.env.EXPRESS_PORT); 
 
 const eventsConnection = require("./mongodb/eventsConnection");
-eventsConnection.init();
-
-const useApiV1 = require("./routes/api/v1/useV1"); 
 
 if(!port) {
     throw new Error("EXPRESS_PORT in .env is not a number!");
 }
-
 
 function exitHandler() {
     log.log("exitHandler", "Closing connections")
@@ -33,15 +29,21 @@ function exitHandler() {
 process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
 
-app.use(bodyParser.json());
+async function run() {
+    await eventsConnection.init();
 
-app.use(loggerMiddleware); 
+    app.use(bodyParser.json());
 
-app.use(createLocMiddleware()); 
+    app.use(loggerMiddleware); 
+    
+    app.use(createLocMiddleware()); 
+    
+    // Require API
+    require("./routes/api/v1/useV1")(app); 
+    
+    app.listen(port, function() {
+        log.log("app.listen", "Express listening requests at port " + port);
+    }); 
+}
 
-useApiV1(app); 
-
-
-app.listen(port, function() {
-    log.log("app.listen", "Express listening requests at port " + port);
-}); 
+run(); 
