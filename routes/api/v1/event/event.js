@@ -142,7 +142,7 @@ router.get(`${eventPath}/:eventId/results`, async function results(req, res) {
 
         const suitableDates = found.votes.filter(vote => vote.people.length === people.length); 
 
-        return res.json({id: ObjectId(found.id), name: found.name, suitableDates}); 
+        return res.json({id: ObjectId(found._id), name: found.name, suitableDates}); 
         
     } catch(err) {
         log.error("results", "Error voting event event");
