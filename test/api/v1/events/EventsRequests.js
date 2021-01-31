@@ -6,26 +6,30 @@ module.exports = function EventRequests(app, eventUrl) {
     this.listEvents = async () => {
         return await chai.request(app)
                         .get(`${eventUrl}/list`)
-                        .send()
-                        
-        
+                        .send();
     }
 
     this.createEvent = async (reqBody) => {
         return await chai.request(app)
                         .post(`${eventUrl}`)
-                        .send(reqBody)
+                        .send(reqBody);
     }
 
-    this.showEvent = async () => {
-
+    this.showEvent = async (eventId) => {
+        return await chai.request(app)
+                        .get(`${eventUrl}/${eventId}`)
+                        .send();
     }
 
-    this.voteEvent = async () => {
-
+    this.voteEvent = async (eventId, reqBody) => {
+        return await chai.request(app)
+                        .post(`${eventUrl}/${eventId}/vote`)
+                        .send(reqBody); 
     },
 
-    this.resultEvent = async () => {
-
+    this.resultEvent = async (eventId) => {
+        return await chai.request(app)
+                        .get(`${eventUrl}/${eventId}/results`)
+                        .send(); 
     }
 }

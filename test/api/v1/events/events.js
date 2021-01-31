@@ -1,6 +1,7 @@
 let app; 
 let eventRequests; 
 
+const { assert } = require("chai");
 const chai = require("chai"); 
 const chaiHttp = require("chai-http"); 
 chai.should(); 
@@ -11,6 +12,7 @@ const { getClient, getConnection } = require("../../../../mongodb/eventsConnecti
 const {v1Path, eventPath} = require("../../../../routes/api/v1/constants"); 
 const URL = v1Path + eventPath;
 
+const testData = require("./eventTestData");
 
 before(function(done) {
     const onAppLoaded = startedApp => {
@@ -25,23 +27,55 @@ before(function(done) {
     require("../../../../app")(process.env.MONGO_DB_TEST_EVENTS_DATABASE + dateString, onAppLoaded); 
 });
 
-describe("Events API - " + URL, function() {
-    it("/list empty events", async () => {
+describe("Events API - successful " + URL, function() {
+    // Check that /list works and that database is empty / new
+    it("List empty events", async () => {
         const {status, body} = await eventRequests.listEvents();
-        status.should.eql(200);
-        body.events.should.a("array");
-       // body.events.length.should.eql(0);
+        status.should.eql(200, "List command should have status 200");
+        body.events.should.a("array", "Retured list should be an array");
+        body.events.length.should.eql(0, "List's length should be 0 as database is new");
     }); 
 
-    it("Test create and find after it", async () => {
-        const reqBody = {
-            name: "Test event",
-            dates: ["2020-1-1", "2021-1-1"]
-        }; 
+    // Test that create works and correct id is returned after
+    it("Create, find, vote and show results of event", async () => {
+        const redWeddingEvent = testData.redWedding;  
     
-        const {status, body} = await eventRequests.createEvent(reqBody);
-        status.should.eql(201);
+        const {status: createStatus, body: createBody} = await eventRequests.createEvent(redWeddingEvent.event);
+        createStatus.should.eql(201), "Event creation status should be 201";
+        createBody.id.should.a("string", "Returned id should be string");
 
+        const {status: findStatus, body: findBody} = await eventRequests.showEvent(createBody.id); 
+        findStatus.should.eql(200, "Find created event status should be 200"); 
+        findBody.name.should.eql(redWeddingEvent.event.name, "Found event name should equal same that was given in creation"); 
+        findBody.dates.length.should.eql(redWeddingEvent.event.dates.length, "Found event should have same dates as given in creation"); 
+
+        for(const date of redWeddingEvent.event.dates) {
+            findBody.dates.indexOf(date).should.not.eql(-1, "All dates given dates in creation should be contained in found event's dates");
+        }
+
+        for(const quest of redWeddingEvent.voters) {
+            const {status: voteStatus, body: voteBody} = await eventRequests.voteEvent(createBody.id, quest); 
+            voteStatus.should.eql(200, "Vote should be successful"); 
+            voteBody.id.should.eql(createBody.id, "Vote response's id should be same as created"); 
+            voteBody.votes.should.a("array", "Votes should be an array"); 
+            // First check if quest should have voted on date. If should have voted check if vote has been counted. If not voted return true.
+            const votesCounted = voteBody.votes.every(eventVote => quest.dates.includes(eventVote.date) ? eventVote.people.includes(quest.name) : true); 
+            votesCounted.should.eql(true, "All votes should be counted");
+        }
+
+        const {status: resultStatus, body: resultBody} = await eventRequests.resultEvent(createBody.id);
+        resultStatus.should.eql(200, "Result status should be 200"); 
+        resultBody.id.should.eql(createBody.id, "Result body id should be same as created"); 
+        resultBody.name.should.eql(redWeddingEvent.event.name, "Result event name is same as created");
+        resultBody.suitableDates.should.a("array"); 
+        resultBody.suitableDates.length.should.eql(redWeddingEvent.suitableDates.length, "Suitable dates length should be same in results");
+
+        const peopleArray = redWeddingEvent.voters.map(voter => voter.name); 
+        const resultHaveAllThePeople = resultBody.suitableDates.every(date => peopleArray.every(p => date.people.includes(p))); 
+        resultHaveAllThePeople.should.eql(true, "All voters should be included in possible dates");
+
+        const addSuitableDatesShouldBeIncluded = redWeddingEvent.suitableDates.every(date => resultBody.suitableDates.findIndex(resultDate => resultDate.date === date) !== -1); 
+        addSuitableDatesShouldBeIncluded.should.eql(true, "All suitable dates are included in results");
     }); 
 })
 
@@ -55,5 +89,4 @@ after(async function() {
     }
 
     client.close();
-    process.exit(); 
 });
