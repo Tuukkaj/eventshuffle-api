@@ -17,6 +17,11 @@ if(!port) {
     throw new Error("EXPRESS_PORT in .env is not a number!");
 }
 
+if(process.env.ENV !== "dev" && process.env.ENV !== "production") {
+    log.error("Process enviroment is not defined! Define ENV variable in /env/.env. Possible values 'dev' and 'production' ");
+    process.exit(); 
+}
+
 function exitHandler() {
     log.log("exitHandler", "Closing connections")
     // Close future connections here
