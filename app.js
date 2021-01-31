@@ -29,8 +29,8 @@ function exitHandler() {
 process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
 
-async function run(callback) {
-    await eventsConnection.init();
+async function run(eventDb, callback) {
+    await eventsConnection.init(eventDb);
 
     app.use(bodyParser.json());
 
