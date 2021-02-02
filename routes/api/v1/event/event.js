@@ -33,7 +33,8 @@ router.post(`${eventPath}`, async function add(req, res) {
         return res.status(400).send(req.loc.api("event_create_missing_name"));
     }
 
-    if(!Array.isArray(dates) || dates.length < 1 || dates.some((d, i) => dates.indexOf(d) !== i)) {
+    if(!Array.isArray(dates) || dates.length < 1 
+    || dates.some((d, i) => dates.indexOf(d) !== i) || dates.some(d => !isValidDate(d))) {
         return res.status(400).send(req.loc.api("event_create_missing_dates"));
     }
 

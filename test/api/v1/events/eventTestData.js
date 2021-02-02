@@ -59,6 +59,16 @@ module.exports = {
         differentDateFormat: {
             name: "Coronation of King Robert Baratheon",
             dates: ["2-2-2020"]
+        },
+        badDate: {
+            name: "Coronation of King Robert Baratheon",
+            dates: ["2020-66-66"]
+        }
+    },
+    show: {
+        initialItem: {
+            name: "Battle of the Blackwater",
+            dates: ["2020-12-12", "2020-12-14", "2020-12-14"]
         }
     }
 }

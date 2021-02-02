@@ -118,6 +118,11 @@ describe("Events API - create", function() {
         status.should.eql(400);
     }); 
 
+    it("Bad date format", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.badDate); 
+        status.should.eql(400);
+    });
+
     it("Different date format", async () => {
         const {status, body} = await eventRequests.createEvent(eventTestData.create.differentDateFormat); 
         status.should.eql(201);
