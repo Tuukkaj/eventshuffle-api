@@ -68,7 +68,32 @@ module.exports = {
     show: {
         initialItem: {
             name: "Battle of the Blackwater",
-            dates: ["2020-12-12", "2020-12-14", "2020-12-14"]
+            dates: ["2020-12-12", "2020-12-13", "2020-12-14"],
+            votes: [
+                {
+                    "date": "2020-12-12",
+                    "people": [
+                      "Ghost of Renly Baratheon",
+                      "Stannis Baratheon",
+                      "Tywin Lannister",
+                      "Tyrion Lannister"
+                    ]
+                },
+                {
+                    "date": "2020-12-13",
+                    "people": [
+                        "Joffrey Baratheon",
+                        "Hound",
+                    ]
+                },
+                {
+                    "date": "2020-12-13",
+                    "people": [
+                        "Sansa Stark",
+                        "Dontos Hollard",
+                    ]
+                }
+            ]
         }
     }
 }

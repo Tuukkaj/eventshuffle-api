@@ -1,7 +1,8 @@
 let app; 
 let eventRequests; 
 
-const { assert } = require("chai");
+const { ObjectId } = require("mongodb");
+
 const chai = require("chai"); 
 const chaiHttp = require("chai-http"); 
 chai.should(); 
@@ -14,6 +15,8 @@ const eventTestData = require("./eventTestData");
 const URL = v1Path + eventPath;
 
 const testData = require("./eventTestData");
+const eventsConnection = require("../../../../mongodb/eventsConnection");
+const { assert } = require("chai");
 
 before(function(done) {
     const onAppLoaded = startedApp => {
@@ -130,7 +133,37 @@ describe("Events API - create", function() {
 }); 
 
 describe("Events API - show", function() {
+    let eventId; 
+    const testItem = eventTestData.show.initialItem; 
 
+    before(async function() {
+        const connection = getConnection().collection(process.env.MONGO_DB_EVENTS_COLLECTION); 
+        const created = await connection.insertOne(testItem);
+
+        eventId =  created.ops[0]._id;
+    });
+
+    it("success", async () => { 
+        const {status, body} = await eventRequests.showEvent(eventId); 
+
+        status.should.eql(200);
+        body.name.should.eql(testItem.name); 
+        body.id.should.eql(eventId.toString()); 
+        body.dates.length.should.eql(testItem.dates.length); 
+
+        const areDatesSame = testItem.dates.every(d => body.dates.includes(d)); 
+        assert(areDatesSame, true); 
+        
+        const areVotesSame = testItem.votes.every(vote => {
+            return testItem.votes.some(testVote => {
+                return testVote.date === vote.date && 
+                    testVote.people.length === vote.people.length && 
+                    testVote.people.every(p => vote.people.includes(p)); 
+            });
+        });
+
+        assert(areVotesSame, true);
+    }); 
 }); 
 
 describe("Events API - vote", function() {
