@@ -1,5 +1,6 @@
 module.exports = {
-    event_create_missing_params: "'names' string and 'dates' date array missing from request",
+    event_create_missing_name: "Request must have 'name' parameter with length of atleast 1",
+    event_create_missing_dates: "Request must have 'dates' parameter with length of atleast 1",
     event_creation_failed: "Failed to create event",
     event_listing_failed: "Failed to list events",
     event_find_failed_with_given_id: "Failed to find event with given id: <id>",

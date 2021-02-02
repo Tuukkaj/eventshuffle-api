@@ -10,6 +10,7 @@ chai.use(chaiHttp);
 const { getClient, getConnection } = require("../../../../mongodb/eventsConnection");
 
 const {v1Path, eventPath} = require("../../../../routes/api/v1/constants"); 
+const eventTestData = require("./eventTestData");
 const URL = v1Path + eventPath;
 
 const testData = require("./eventTestData");
@@ -27,7 +28,7 @@ before(function(done) {
     require("../../../../app")(process.env.MONGO_DB_TEST_EVENTS_DATABASE + dateString, onAppLoaded); 
 });
 
-describe("Events API - successful " + URL, function() {
+describe("Events API - successful use case", function() {
     // Check that /list works and that database is empty / new
     it("List empty events", async () => {
         const {status, body} = await eventRequests.listEvents();
@@ -38,7 +39,7 @@ describe("Events API - successful " + URL, function() {
 
     // Test that create works and correct id is returned after
     it("Create, find, vote and show results of event", async () => {
-        const redWeddingEvent = testData.redWedding;  
+        const redWeddingEvent = testData.successfulUseCase;  
     
         const {status: createStatus, body: createBody} = await eventRequests.createEvent(redWeddingEvent.event);
         createStatus.should.eql(201), "Event creation status should be 201";
@@ -77,7 +78,67 @@ describe("Events API - successful " + URL, function() {
         const addSuitableDatesShouldBeIncluded = redWeddingEvent.suitableDates.every(date => resultBody.suitableDates.findIndex(resultDate => resultDate.date === date) !== -1); 
         addSuitableDatesShouldBeIncluded.should.eql(true, "All suitable dates are included in results");
     }); 
-})
+}); 
+
+describe("Events API - create", function() {
+    it("Success", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.success); 
+        status.should.eql(201, "Request should be OK");
+        Object.keys(body).length.should.eql(1, "Request should only return one item"); 
+        body.id.should.a("string", "Response ID should be string");  
+    }); 
+
+    it("No name variable", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.noName); 
+        status.should.eql(400); 
+    }); 
+
+    it("Empty name string", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.emptyName); 
+        status.should.eql(400);
+    }); 
+
+    it("No dates", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.noDates); 
+        status.should.eql(400);
+    }); 
+
+    it("Empty dates array", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.emptyDates); 
+        status.should.eql(400);
+    }); 
+
+    it("Wrong type in dates", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.wrongDateType); 
+        status.should.eql(400);
+    }); 
+
+    it("Two same dates in dates array", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.twoSameDates); 
+        status.should.eql(400);
+    }); 
+
+    it("Different date format", async () => {
+        const {status, body} = await eventRequests.createEvent(eventTestData.create.differentDateFormat); 
+        status.should.eql(201);
+    }); 
+}); 
+
+describe("Events API - show", function() {
+
+}); 
+
+describe("Events API - vote", function() {
+
+}); 
+
+describe("Events API - result", function() {
+
+});
+
+describe("Events API - list", function() {
+
+}); 
 
 after(async function() {
     let connection = getConnection(); 

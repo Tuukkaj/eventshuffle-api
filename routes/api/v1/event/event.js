@@ -29,8 +29,12 @@ router.post(`${eventPath}`, async function add(req, res) {
     const name = req.body.name; 
     const dates = req.body.dates; 
 
-    if(!name || typeof name !== "string" || !Array.isArray(dates)) {
-        return res.status(404).send(req.loc.api("event_create_missing_params"));
+    if(typeof name !== "string" || name.length < 1) {
+        return res.status(400).send(req.loc.api("event_create_missing_name"));
+    }
+
+    if(!Array.isArray(dates) || dates.length < 1 || dates.some((d, i) => dates.indexOf(d) !== i)) {
+        return res.status(400).send(req.loc.api("event_create_missing_dates"));
     }
 
     try {
