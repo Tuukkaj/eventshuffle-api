@@ -95,5 +95,33 @@ module.exports = {
                 }
             ]
         }
+    },
+    vote: {
+        initialItem: {
+            name: "Siege of Riverrun",
+            dates: ["2020-12-12", "2020-12-13", "2020-12-14"]
+        },
+        successVote: {
+            name: "Jaime Lannister",
+            dates: ["2020-12-12", "2020-12-13", "2020-12-14"]
+        },
+        voteTwiceName: {
+            name: "Edmure Tully",
+            dates: ["2020-12-12"]
+        },
+        voteDateNotInEvent: {
+            name: "Blackfish",
+            dates: ["1999-12-12"]
+        },
+        noName: {
+            dates: ["2020-12-12"]
+        },
+        noDate: {
+            name: "Ryman Frey"
+        },
+        twoSameDates: {
+            name: "Daven Lannister",
+            dates: ["2020-12-12","2020-12-12"]
+        }
     }
 }
