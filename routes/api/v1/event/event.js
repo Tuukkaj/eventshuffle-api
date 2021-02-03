@@ -98,6 +98,10 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
         return res.status(404).send(req.loc.api("event_date_must_be_date_arr"));
     }
 
+    if(new Set(dates).size !== dates.length) {
+        return res.status(404).send(req.loc.api("event_vote_dates_must_be_unique"));
+    }
+
     try {
         const eventObjectId = ObjectId(eventId); 
         const found = await events.findOne({_id: eventObjectId});
