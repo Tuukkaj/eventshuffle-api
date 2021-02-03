@@ -126,6 +126,8 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
                         people: [name]
                     })
                 }
+            } else {
+                return res.status(404).send(req.loc.api("event_vote_date_not_in_event: " + eventDate));
             }
         }
 
