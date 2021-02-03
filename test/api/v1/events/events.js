@@ -173,7 +173,9 @@ describe("Events API - show", function() {
 }); 
 
 describe("Events API - vote", function() {
-    
+    let eventId; 
+    const { initialItem } = eventTestData.vote;
+
 
     before(async function() {
         const connection = getConnection().collection(process.env.MONGO_DB_EVENTS_COLLECTION); 
@@ -198,7 +200,7 @@ describe("Events API - vote", function() {
             voteDateIsIncluded.should.true;
             voterIsIncluded.should.true;
         }
-}); 
+    });
 
     it("Try to vote with same name two times", async () => {
         const { voteTwiceName } = eventTestData.vote;
@@ -234,11 +236,62 @@ describe("Events API - vote", function() {
 }); 
 
 describe("Events API - result", function() {
+    let successEventId, noVotesId; 
+    const {success, successSuitableDates, noVotes} = eventTestData.result; 
 
+    before(async function() {
+        const connection = getConnection().collection(process.env.MONGO_DB_EVENTS_COLLECTION); 
+
+        const successCreated = await connection.insertOne(success);
+        successEventId = successCreated.ops[0]._id;
+
+        const noVotesCreated = await connection.insertOne(noVotes); 
+        noVotesId = noVotesCreated.ops[0]._id;
+    }); 
+
+    it("Success", async () => {
+        const {status, body} = await eventRequests.resultEvent(successEventId);
+        status.should.eql(200);
+        body.name.should.eql(success.name);
+        body.suitableDates.length.should.eql(successSuitableDates.length);
+        
+        const suitableDatesAreCorrect = body.suitableDates.every(d => successSuitableDates.includes(d.date));
+        suitableDatesAreCorrect.should.true; 
+    });
+
+    it("No votes", async () => {
+        const {status, body} = await eventRequests.resultEvent(noVotesId);
+        status.should.eql(204);
+    });
+
+    it("Bad event ID", async () => {
+        const {status, body} = await eventRequests.showEvent("THIS IS NOT AN EVENT ID"); 
+
+        status.should.eql(400); 
+    }); 
 });
 
 describe("Events API - list", function() {
+    let eventId; 
+    let events; 
 
+    before(async function () {
+        const connection = getConnection().collection(process.env.MONGO_DB_EVENTS_COLLECTION); 
+        events = await connection.find({}).toArray(); 
+    }); 
+    
+    it("All events are listed", async () => {
+        const {status, body} = await eventRequests.listEvents();
+        body.events.length.should.eql(events.length);
+        
+        for(const e of events) {
+            const isEventInList = body.events.some(bodyEvent => {
+                return bodyEvent.name === e.name && bodyEvent.id === e._id.toString();
+            });
+            
+            isEventInList.should.true;
+        }
+    });
 }); 
 
 after(async function() {

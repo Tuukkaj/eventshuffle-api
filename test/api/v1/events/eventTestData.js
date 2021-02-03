@@ -123,5 +123,43 @@ module.exports = {
             name: "Daven Lannister",
             dates: ["2020-12-12","2020-12-12"]
         }
+    },
+    result: {
+        success: {
+            name: "Battle In the Whispering Woods",
+            dates: ["2020-1-1", "2021-1-1", "2022-1-1", "2023-1-1", "2024-1-1"],
+            votes: [
+                {
+                    date: "2020-1-1",
+                    people: [
+                        "Jaime Lannister",
+                        "Rob Stark",
+                        "Great Jon", 
+                        "Brynden Tully"
+                    ]
+                },
+                {
+                    date: "2021-1-1",
+                    people: [
+                        "Jaime Lannister",
+                        "Rob Stark",
+                        "Great Jon", 
+                        "Brynden Tully"
+                    ]
+                },
+                {
+                    date: "2024-1-1",
+                    people: [
+                        "Great Jon", 
+                        "Brynden Tully"
+                    ]
+                }
+            ]
+        },
+        successSuitableDates: ["2020-1-1", "2021-1-1"],
+        noVotes: {
+            name: "Kingsmoot",
+            dates: ["2020-1-1", "2024-1-1"],
+        }
     }
 }
