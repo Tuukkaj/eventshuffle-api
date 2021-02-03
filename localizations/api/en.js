@@ -10,5 +10,7 @@ module.exports = {
     event_name_already_voted: "<name> has already voted! Choose other name",
     event_result_failed: "Failed to search event results",
     event_result_not_voted: "People have not yet voted",
-    event_not_valid_event_id: "Given ID was not valid"
+    event_not_valid_event_id: "Given ID was not valid",
+    event_vote_date_not_in_event: "Given vote's date is not in event: ",
+    event_vote_dates_must_be_unique: "Vote's dates must be unique"
 }
