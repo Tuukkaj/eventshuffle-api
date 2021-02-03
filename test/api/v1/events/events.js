@@ -174,6 +174,63 @@ describe("Events API - show", function() {
 
 describe("Events API - vote", function() {
     
+
+    before(async function() {
+        const connection = getConnection().collection(process.env.MONGO_DB_EVENTS_COLLECTION); 
+        const created = await connection.insertOne(initialItem);
+
+        eventId = created.ops[0]._id;
+    });
+
+    it("Success", async () => {
+        const { successVote } = eventTestData.vote;
+        const {status, body} = await eventRequests.voteEvent(eventId, successVote);
+        status.should.eql(200);
+
+        body.name.should.eql(initialItem.name);
+        body.dates.length.should.eql(initialItem.dates.length);
+        body.votes.should.a("array");
+        body.votes.length.should.eql(successVote.dates.length);
+
+        for(const vote of body.votes) {
+            const voteDateIsIncluded = successVote.dates.includes(vote.date);
+            const voterIsIncluded = vote.people.includes(successVote.name);
+            voteDateIsIncluded.should.true;
+            voterIsIncluded.should.true;
+        }
+}); 
+
+    it("Try to vote with same name two times", async () => {
+        const { voteTwiceName } = eventTestData.vote;
+        const { status, body } = await eventRequests.voteEvent(eventId, voteTwiceName);
+        status.should.eql(200);
+        const { status: secondStatus, body: secondBody } = await eventRequests.voteEvent(eventId, voteTwiceName);
+        secondStatus.should.eql(404);
+    });
+
+    it("No name", async () => {
+        const { noName } = eventTestData.vote;
+        const { status, body } = await eventRequests.voteEvent(eventId, noName);
+        status.should.eql(404);
+    }); 
+
+    it("No dates", async () => {
+        const { noDate } = eventTestData.vote;
+        const { status, body } = await eventRequests.voteEvent(eventId, noDate);
+        status.should.eql(404);
+    }); 
+
+    it("Date that isn't in event", async () => {
+        const { voteDateNotInEvent } = eventTestData.vote;
+        const { status, body } = await eventRequests.voteEvent(eventId, voteDateNotInEvent);
+        status.should.eql(404);
+    });
+
+    it("Two same dates in vote", async () => {
+        const { twoSameDates } = eventTestData.vote;
+        const { status, body } = await eventRequests.voteEvent(eventId, twoSameDates);
+        status.should.eql(404);
+    });
 }); 
 
 describe("Events API - result", function() {
