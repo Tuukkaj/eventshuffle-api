@@ -153,11 +153,11 @@ router.get(`${eventPath}/:eventId/results`, async function results(req, res) {
     if(!ObjectId.isValid(eventId)) {
         return res.status(400).send(req.loc.api("event_not_valid_event_id"));
     }
-    
+
     try {
         const found = await events.findOne({_id: ObjectId(eventId)});
         
-        if(!Array.isArray(found.votes) && votes.length < 1) {
+        if(!Array.isArray(found.votes) || found.votes.length < 1) {
             return res.status(204).send(req.loc.api("event_result_not_voted")); 
         }
 
