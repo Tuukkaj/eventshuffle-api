@@ -9,5 +9,6 @@ module.exports = {
     event_date_must_be_date_arr: "Date must be array with yyyy-mm-dd string values inside it",
     event_name_already_voted: "<name> has already voted! Choose other name",
     event_result_failed: "Failed to search event results",
-    event_result_not_voted: "People have not yet voted"
+    event_result_not_voted: "People have not yet voted",
+    event_not_valid_event_id: "Given ID was not valid"
 }

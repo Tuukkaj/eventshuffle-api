@@ -58,6 +58,10 @@ router.post(`${eventPath}`, async function add(req, res) {
 router.get(`${eventPath}/:eventId`, async function show(req, res) {
     const { eventId } = req.params; 
 
+    if(!ObjectId.isValid(eventId)) {
+        return res.status(400).send(req.loc.api("event_not_valid_event_id"));
+    }
+
     try {
         const found = await events.findOne({_id: ObjectId(eventId)});
 
@@ -84,6 +88,10 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
 
     if(typeof name !== "string" || name.length < 1) {
         return res.status(404).send(req.loc.api("event_name_must_be_string")); 
+    }
+
+    if(!ObjectId.isValid(eventId)) {
+        return res.status(400).send(req.loc.api("event_not_valid_event_id"));
     }
 
     if(!Array.isArray(dates) || !dates.every(isValidDate)) {
@@ -136,6 +144,10 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
 router.get(`${eventPath}/:eventId/results`, async function results(req, res) {
     const { eventId } = req.params; 
 
+    if(!ObjectId.isValid(eventId)) {
+        return res.status(400).send(req.loc.api("event_not_valid_event_id"));
+    }
+    
     try {
         const found = await events.findOne({_id: ObjectId(eventId)});
         

@@ -164,10 +164,16 @@ describe("Events API - show", function() {
 
         assert(areVotesSame, true);
     }); 
+
+    it("Bad event ID", async () => {
+        const {status, body} = await eventRequests.showEvent("THIS IS NOT AN EVENT ID"); 
+
+        status.should.eql(400); 
+    }); 
 }); 
 
 describe("Events API - vote", function() {
-
+    
 }); 
 
 describe("Events API - result", function() {
