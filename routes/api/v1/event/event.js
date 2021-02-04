@@ -16,12 +16,12 @@ router.get(`${eventPath}/list`, async function list(req, res) {
             return res.json({events: list}); 
         }
 
-        return res.status(500).send(req.loc.api("event_listing_failed")); 
+        return res.status(500).send(req.loc.api.event_listing_failed); 
 
     } catch(err) {
         log.error("list", "Error listing events");
         log.error("list", err); 
-        return res.status(500).send(req.loc.api("event_listing_failed")); 
+        return res.status(500).send(req.loc.api.event_listing_failed); 
     }
 }); 
 
@@ -30,12 +30,12 @@ router.post(`${eventPath}`, async function add(req, res) {
     const dates = req.body.dates; 
 
     if(typeof name !== "string" || name.length < 1) {
-        return res.status(400).send(req.loc.api("event_create_missing_name"));
+        return res.status(400).send(req.loc.api.event_create_missing_name);
     }
 
     if(!Array.isArray(dates) || dates.length < 1 
     || dates.some((d, i) => dates.indexOf(d) !== i) || dates.some(d => !isValidDate(d))) {
-        return res.status(400).send(req.loc.api("event_create_missing_dates"));
+        return res.status(400).send(req.loc.api.event_create_missing_dates);
     }
 
     try {
@@ -45,12 +45,12 @@ router.post(`${eventPath}`, async function add(req, res) {
             return res.status(201).json({id: ObjectId(created.ops[0]._id)}); 
         }
 
-        return res.status(500).send(req.loc.api("event_creation_failed")); 
+        return res.status(500).send(req.loc.api.event_creation_failed); 
 
     } catch(err) {
         log.error("add", "Error creating new event");
         log.error("add", err); 
-        return res.status(500).send(req.loc.api("event_creation_failed")); 
+        return res.status(500).send(req.loc.api.event_creation_failed); 
     }
 }); 
 
@@ -59,7 +59,7 @@ router.get(`${eventPath}/:eventId`, async function show(req, res) {
     const { eventId } = req.params; 
 
     if(!ObjectId.isValid(eventId)) {
-        return res.status(400).send(req.loc.api("event_not_valid_event_id"));
+        return res.status(400).send(req.loc.api.event_not_valid_event_id);
     }
 
     try {
@@ -71,12 +71,12 @@ router.get(`${eventPath}/:eventId`, async function show(req, res) {
             return res.json({id, ...found});
         }
 
-        return res.status(404).send(req.loc.api("event_find_failed_with_given_id").replace("<id>", eventId)); 
+        return res.status(404).send(req.loc.api.event_find_failed_with_given_id.replace("<id>", eventId)); 
 
     } catch(err) {
         log.error("show", "Error finding event");
         log.error("show", err); 
-        return res.status(500).send(req.loc.api("event_find_failed")); 
+        return res.status(500).send(req.loc.api.event_find_failed); 
     }
 
 }); 
@@ -87,19 +87,19 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
     const dates = req.body.dates; 
 
     if(typeof name !== "string" || name.length < 1) {
-        return res.status(404).send(req.loc.api("event_name_must_be_string")); 
+        return res.status(404).send(req.loc.api.event_name_must_be_string); 
     }
 
     if(!ObjectId.isValid(eventId)) {
-        return res.status(400).send(req.loc.api("event_not_valid_event_id"));
+        return res.status(400).send(req.loc.api.event_not_valid_event_id);
     }
 
     if(!Array.isArray(dates) || !dates.every(isValidDate)) {
-        return res.status(404).send(req.loc.api("event_date_must_be_date_arr"));
+        return res.status(404).send(req.loc.api.event_date_must_be_date_arr);
     }
 
     if(new Set(dates).size !== dates.length) {
-        return res.status(404).send(req.loc.api("event_vote_dates_must_be_unique"));
+        return res.status(404).send(req.loc.api.event_vote_dates_must_be_unique);
     }
 
     try {
@@ -107,7 +107,7 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
         const found = await events.findOne({_id: eventObjectId});
 
         if(!found) {
-            return res.status(404).send(req.loc.api("event_find_failed_with_given_id").replace("<id>", eventId)); 
+            return res.status(404).send(req.loc.api.event_find_failed_with_given_id.replace("<id>", eventId)); 
         }
 
         let votes = Array.isArray(found.votes) ? found.votes : []; 
@@ -115,7 +115,7 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
         const people = [...new Set((votes.map(vote => vote.people).flat()))];
 
         if(people.includes(name)) {
-            return res.status(404).send(req.loc.api("event_name_already_voted").replace("<name>", name)); 
+            return res.status(404).send(req.loc.api.event_name_already_voted.replace("<name>", name)); 
         }
 
         for(let eventDate of dates) {
@@ -131,7 +131,7 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
                     })
                 }
             } else {
-                return res.status(404).send(req.loc.api("event_vote_date_not_in_event: " + eventDate));
+                return res.status(404).send(req.loc.api.event_vote_date_not_in_event + ": " + eventDate);
             }
         }
 
@@ -143,7 +143,7 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
     } catch(err) {
         log.error("vote", "Error voting event");
         log.error("vote", err); 
-        return res.status(500).send(req.loc.api("event_find_failed")); 
+        return res.status(500).send(req.loc.api.event_find_failed); 
     }
 }); 
 
@@ -151,14 +151,14 @@ router.get(`${eventPath}/:eventId/results`, async function results(req, res) {
     const { eventId } = req.params; 
 
     if(!ObjectId.isValid(eventId)) {
-        return res.status(400).send(req.loc.api("event_not_valid_event_id"));
+        return res.status(400).send(req.loc.api.event_not_valid_event_id);
     }
 
     try {
         const found = await events.findOne({_id: ObjectId(eventId)});
         
         if(!Array.isArray(found.votes) || found.votes.length < 1) {
-            return res.status(204).send(req.loc.api("event_result_not_voted")); 
+            return res.status(204).send(req.loc.api.event_result_not_voted); 
         }
 
         const people = [...new Set((found.votes.map(vote => vote.people).flat()))];
@@ -170,7 +170,7 @@ router.get(`${eventPath}/:eventId/results`, async function results(req, res) {
     } catch(err) {
         log.error("results", "Error voting event event");
         log.error("results", err); 
-        return res.status(500).send(req.loc.api("event_result_failed")); 
+        return res.status(500).send(req.loc.api.event_result_failed); 
     }
 }); 
 

@@ -3,16 +3,19 @@ const apiLocs = {
     "fi": require("./api/fi")
 }
 
-function apiTranslate(lang, key) {
-    return apiLocs[lang].hasOwnProperty(key) ? apiLocs[lang][key] : key; 
+const apiProxyHandler = {
+    get: function(target, prop) {
+        return prop in target ? target[prop] : prop; 
+    }
 }
 
 module.exports = function createLocalizationMiddleware() {
     return function(req, res, next) {
-        const lang = req.headers.lang && apiLocs.hasOwnProperty(req.headers.lang) ? req.headers.lang : "en"; 
+        // This is very simple localization. Accept-Language could contain list of accepted langauges with weighting. But for demonstration purposes eventshuffle-api accepts only one.
+        const lang = req.headers["accept-language"] && apiLocs.hasOwnProperty(req.headers["accept-language"]) ? req.headers["accept-language"] : "en"; 
 
         req.loc = {
-            api: apiTranslate.bind(null, lang)
+            api: new Proxy(apiLocs[lang], apiProxyHandler)
         }
 
         next(); 
