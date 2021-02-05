@@ -1,7 +1,7 @@
 const router = require("express").Router(); 
 const { ObjectId } = require("mongodb");
 const {eventPath} = require("../constants"); 
-const { isValidDate, replaceMongoIdProperty } = require("../helpers");
+const { isValidDate, replaceMongoIdProperty, unifyDateString } = require("../helpers");
 const db = require("../../../../mongodb/eventsConnection").getConnection();
 const events = db.collection(process.env.MONGO_DB_EVENTS_COLLECTION);
 const log = new (require("../../../../logger/Logger"))("event.js"); 
@@ -38,8 +38,10 @@ router.post(`${eventPath}`, async function add(req, res) {
         return res.status(400).send(req.loc.api.event_create_missing_dates);
     }
 
+    const transformedDates = dates.map(unifyDateString); 
+
     try {
-        const created = await events.insertOne({name, dates});
+        const created = await events.insertOne({name, dates: transformedDates});
 
         if(created) {
             return res.status(201).json({id: ObjectId(created.ops[0]._id)}); 
@@ -119,19 +121,21 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
         }
 
         for(let eventDate of dates) {
-            if(found.dates.includes(eventDate)) {
-                let voteIndex = votes.findIndex(voteDate => voteDate.date === eventDate); 
+            const unifiedDateString = unifyDateString(eventDate); 
+
+            if(found.dates.includes(unifiedDateString)) {
+                const voteIndex = votes.findIndex(voteDate => voteDate.date === unifiedDateString); 
 
                 if(voteIndex !== -1) {
                     votes[voteIndex].people.push(name); 
                 } else {
                     votes.push({
-                        date: eventDate,
+                        date: unifiedDateString,
                         people: [name]
                     })
                 }
             } else {
-                return res.status(404).send(req.loc.api.event_vote_date_not_in_event + ": " + eventDate);
+                return res.status(404).send(req.loc.api.event_vote_date_not_in_event + ": " + unifiedDateString);
             }
         }
 

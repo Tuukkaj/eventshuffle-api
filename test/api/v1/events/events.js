@@ -17,6 +17,7 @@ const URL = v1Path + eventPath;
 const testData = require("./eventTestData");
 const eventsConnection = require("../../../../mongodb/eventsConnection");
 const { assert } = require("chai");
+const { unifyDateString } = require("../../../../routes/api/v1/helpers");
 
 before(function(done) {
     const onAppLoaded = startedApp => {
@@ -54,7 +55,8 @@ describe("Events API - successful use case", function() {
         findBody.dates.length.should.eql(redWeddingEvent.event.dates.length, "Found event should have same dates as given in creation"); 
 
         for(const date of redWeddingEvent.event.dates) {
-            findBody.dates.indexOf(date).should.not.eql(-1, "All dates given dates in creation should be contained in found event's dates");
+            const transformedDate = unifyDateString(date);
+            findBody.dates.indexOf(transformedDate).should.not.eql(-1, "All dates given dates in creation should be contained in found event's dates");
         }
 
         for(const quest of redWeddingEvent.voters) {
@@ -63,7 +65,8 @@ describe("Events API - successful use case", function() {
             voteBody.id.should.eql(createBody.id, "Vote response's id should be same as created"); 
             voteBody.votes.should.a("array", "Votes should be an array"); 
             // First check if quest should have voted on date. If should have voted check if vote has been counted. If not voted return true.
-            const votesCounted = voteBody.votes.every(eventVote => quest.dates.includes(eventVote.date) ? eventVote.people.includes(quest.name) : true); 
+            const questTransformedDates = quest.dates.map(unifyDateString);
+            const votesCounted = voteBody.votes.every(eventVote => questTransformedDates.includes(eventVote.date) ? eventVote.people.includes(quest.name) : true); 
             votesCounted.should.eql(true, "All votes should be counted");
         }
 
@@ -78,7 +81,7 @@ describe("Events API - successful use case", function() {
         const resultHaveAllThePeople = resultBody.suitableDates.every(date => peopleArray.every(p => date.people.includes(p))); 
         resultHaveAllThePeople.should.eql(true, "All voters should be included in possible dates");
 
-        const addSuitableDatesShouldBeIncluded = redWeddingEvent.suitableDates.every(date => resultBody.suitableDates.findIndex(resultDate => resultDate.date === date) !== -1); 
+        const addSuitableDatesShouldBeIncluded = redWeddingEvent.suitableDates.every(date => resultBody.suitableDates.findIndex(resultDate => resultDate.date === unifyDateString(date)) !== -1); 
         addSuitableDatesShouldBeIncluded.should.eql(true, "All suitable dates are included in results");
     }); 
 }); 

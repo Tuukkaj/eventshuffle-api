@@ -18,3 +18,11 @@ exports.replaceMongoIdProperty = function(mongoObject) {
     mongoObject.id = id; 
     return mongoObject; 
 }
+
+exports.unifyDateString = function(dateString) {
+    const dObject = new Date(dateString);
+
+    const month = dObject.getMonth() < 10 ? "0" + (dObject.getMonth() + 1): dObject.getMonth() + 1; 
+    const date = dObject.getDate() < 10 ? "0" + dObject.getDate() : dObject.getDate(); 
+    return `${dObject.getFullYear()}-${month}-${date}`;
+}
