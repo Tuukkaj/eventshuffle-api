@@ -1,23 +1,24 @@
 const getTime = require("./time"); 
+const winston = require("./winstonLogger");
 
 module.exports = function Logger(fileName) {
-    function createInfoText(type) {
-        return `[${getTime()}][${type}][${fileName}]`
+    function createInfoText() {
+        return `[${getTime()}][${fileName}]`
     }
 
-    this.info = function(funcName, text) {
-        console.info(`${createInfoText("info")}[${funcName}]: ${text}`);
+    this.debug = function(funcName, text) {
+      winston.debug(`${createInfoText()}[${funcName}]: ${text}`);
     }
 
     this.log = function(funcName, text) {
-        console.log(`${createInfoText("log")}[${funcName}]: ${text}`);
+      winston.info(`${createInfoText()}[${funcName}]: ${text}`);
     }
 
     this.warn = function(funcName, text) {
-        console.warn(`${createInfoText("warn")}[${funcName}]: ${text}`);
+      winston.warn(`${createInfoText()}[${funcName}]: ${text}`);
     }
 
     this.error = function(funcName, text) {
-        console.error(`${createInfoText("error")}[${funcName}]: ${text}`);
+      winston.error(`${createInfoText()}[${funcName}]: ${text}`);
     }
 }
