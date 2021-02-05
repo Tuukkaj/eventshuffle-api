@@ -1,5 +1,5 @@
 const getTime = require("./time"); 
-const winston = require("./winstonLogger");
+const {logger : winston} = require("./winstonLogger");
 
 module.exports = function Logger(fileName) {
     function createInfoText() {

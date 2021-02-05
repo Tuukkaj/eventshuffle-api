@@ -301,7 +301,7 @@ after(async function() {
     let connection = getConnection(); 
     let client = getClient(); 
 
-    if(process.env.ENV === "dev" && process.env.TEST_ENV_DROP_DB_AFTER_TEST === "true") {
+    if(process.env.NODE_ENV === "development" && process.env.TEST_ENV_DROP_DB_AFTER_TEST === "true") {
         const dropRes = await connection.dropDatabase(); 
         console.log(dropRes ? "Test database dropped successfully" : "Couldn't drop test database");
     }

@@ -1,5 +1,5 @@
 const getTime = require("./time");  
-const winston = require("./winstonLogger");
+const {logger : winston} = require("./winstonLogger");
 
 module.exports = function loggerMiddleware(req, res, next) {
     res.on("finish", function() {

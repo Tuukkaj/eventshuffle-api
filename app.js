@@ -1,9 +1,11 @@
 const path = require("path"); 
 require("dotenv").config({path: path.resolve(__dirname, './env/.env')});
 
+const { initLogger } = require("./logger/winstonLogger");
+initLogger(process.env.NODE_ENV);
 const log = new (require("./logger/Logger"))("app.js"); 
-
 const loggerMiddleware = require("./logger/loggerMiddleware");
+
 const createLocMiddleware = require("./localizations/createLocalizationMiddleware");
 
 const app = require("express")();
@@ -17,8 +19,9 @@ if(!port) {
     throw new Error("EXPRESS_PORT in .env is not a number!");
 }
 
-if(process.env.ENV !== "dev" && process.env.ENV !== "production") {
-    log.error("Process enviroment is not defined! Define ENV variable in /env/.env. Possible values 'dev' and 'production' ");
+
+if(process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "production") {
+    log.error("Process enviroment is not defined! Define NODE_ENV variable in /env/.env. Possible values 'development' and 'production'");
     process.exit(); 
 }
 
