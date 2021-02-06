@@ -105,7 +105,7 @@ EXPRESS_PORT=3000 // Port of Events API
 
 NODE_ENV=development // Enviroment. If 'development' logging will be done to console. If 'production' logging will be done to /logs folder.
 
-TEST_ENV_DROP_DB_AFTER_TEST=true // If 'true' and NODE_ENV development, test database will be droppped after tests are executed. 
+TEST_ENV_DROP_DB_AFTER_TEST=true // If 'true' and NODE_ENV is 'development', test database will be droppped after tests are executed. 
 ````
 
 After this application should be ready to run!
