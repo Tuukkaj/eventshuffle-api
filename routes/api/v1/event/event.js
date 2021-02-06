@@ -6,7 +6,9 @@ const db = require("../../../../mongodb/eventsConnection").getConnection();
 const events = db.collection(process.env.MONGO_DB_EVENTS_COLLECTION);
 const log = new (require("../../../../logger/Logger"))("event.js"); 
 
-
+/**
+ * GET Lists all events
+ */
 router.get(`${eventPath}/list`, async function list(req, res) {
     try {
         let list = await events.find().toArray(); 
@@ -16,6 +18,7 @@ router.get(`${eventPath}/list`, async function list(req, res) {
             return res.json({events: list}); 
         }
 
+        // If no list is given return 500
         return res.status(500).send(req.loc.api.event_listing_failed); 
 
     } catch(err) {
@@ -25,19 +28,24 @@ router.get(`${eventPath}/list`, async function list(req, res) {
     }
 }); 
 
+/**
+ * POST create new event
+ */
 router.post(`${eventPath}`, async function add(req, res) {
-    const name = req.body.name; 
-    const dates = req.body.dates; 
+    const name = req.body.name; // Name of event
+    const dates = req.body.dates; // Dates of event
 
     if(typeof name !== "string" || name.length < 1) {
         return res.status(400).send(req.loc.api.event_create_missing_name);
     }
 
+    // Check that dates are valid
     if(!Array.isArray(dates) || dates.length < 1 
     || dates.some((d, i) => dates.indexOf(d) !== i) || dates.some(d => !isValidDate(d))) {
         return res.status(400).send(req.loc.api.event_create_missing_dates);
     }
 
+    // Unify dates to yyyy-mm-dd format
     const transformedDates = dates.map(unifyDateString); 
 
     try {
@@ -56,10 +64,13 @@ router.post(`${eventPath}`, async function add(req, res) {
     }
 }); 
 
-
+/**
+ * GET Shows event details
+ */
 router.get(`${eventPath}/:eventId`, async function show(req, res) {
-    const { eventId } = req.params; 
+    const { eventId } = req.params; // ID of event
 
+    // Check that given object id is valid
     if(!ObjectId.isValid(eventId)) {
         return res.status(400).send(req.loc.api.event_not_valid_event_id);
     }
@@ -73,6 +84,7 @@ router.get(`${eventPath}/:eventId`, async function show(req, res) {
             return res.json({id, ...found});
         }
 
+        // If no event is found return 404
         return res.status(404).send(req.loc.api.event_find_failed_with_given_id.replace("<id>", eventId)); 
 
     } catch(err) {
@@ -83,23 +95,29 @@ router.get(`${eventPath}/:eventId`, async function show(req, res) {
 
 }); 
 
+/**
+ * POST Votes event
+ */
 router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
-    const { eventId } = req.params; 
-    const name = req.body.name; 
-    const dates = req.body.dates; 
+    const { eventId } = req.params; // Id of event 
+    const name = req.body.name; // Name of voter
+    const dates = req.body.dates; // Dates of vote
 
     if(typeof name !== "string" || name.length < 1) {
         return res.status(404).send(req.loc.api.event_name_must_be_string); 
     }
 
+    // Check that given ID is valid
     if(!ObjectId.isValid(eventId)) {
         return res.status(400).send(req.loc.api.event_not_valid_event_id);
     }
 
+    // Check that given dates are valid
     if(!Array.isArray(dates) || !dates.every(isValidDate)) {
         return res.status(404).send(req.loc.api.event_date_must_be_date_arr);
     }
 
+    // Check that all dates are unique
     if(new Set(dates).size !== dates.length) {
         return res.status(404).send(req.loc.api.event_vote_dates_must_be_unique);
     }
@@ -108,14 +126,18 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
         const eventObjectId = ObjectId(eventId); 
         const found = await events.findOne({_id: eventObjectId});
 
+        // If event is not found return 404
         if(!found) {
             return res.status(404).send(req.loc.api.event_find_failed_with_given_id.replace("<id>", eventId)); 
         }
 
+        // Get event's votes. If there are none new array is created
         let votes = Array.isArray(found.votes) ? found.votes : []; 
 
+        // Get all unique people voted
         const people = [...new Set((votes.map(vote => vote.people).flat()))];
 
+        // Check that same name is not used in events. Aka voter name should always be unique
         if(people.includes(name)) {
             return res.status(404).send(req.loc.api.event_name_already_voted.replace("<name>", name)); 
         }
@@ -139,7 +161,9 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
             }
         }
 
+        // Replace existing votes array with new votes
         found.votes = votes; 
+        // Update event
         const updated = await events.findOneAndReplace({_id: eventObjectId}, found, {returnOriginal: false}); 
 
         return res.json(replaceMongoIdProperty(updated.value));
@@ -151,9 +175,13 @@ router.post(`${eventPath}/:eventId/vote`, async function vote(req, res) {
     }
 }); 
 
+/**
+ * GET Shows results of event voting
+ */
 router.get(`${eventPath}/:eventId/results`, async function results(req, res) {
-    const { eventId } = req.params; 
+    const { eventId } = req.params; // Id of event 
 
+    // Check that event id is valid
     if(!ObjectId.isValid(eventId)) {
         return res.status(400).send(req.loc.api.event_not_valid_event_id);
     }
@@ -161,12 +189,15 @@ router.get(`${eventPath}/:eventId/results`, async function results(req, res) {
     try {
         const found = await events.findOne({_id: ObjectId(eventId)});
         
+        // Check if there is votes in event. If not return 204
         if(!Array.isArray(found.votes) || found.votes.length < 1) {
             return res.status(204).send(req.loc.api.event_result_not_voted); 
         }
 
+        // Get all of the unique people that have voted
         const people = [...new Set((found.votes.map(vote => vote.people).flat()))];
 
+        // Get all of the suitable dates
         const suitableDates = found.votes.filter(vote => vote.people.length === people.length); 
 
         return res.json({id: ObjectId(found._id), name: found.name, suitableDates}); 

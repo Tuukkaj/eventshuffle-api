@@ -1,11 +1,12 @@
 const path = require("path"); 
-require("dotenv").config({path: path.resolve(__dirname, './env/.env')});
+require("dotenv").config({path: path.resolve(__dirname, './env/.env')}); // Init process.env variables
 
-const { initLogger } = require("./logger/winstonLogger");
-initLogger(process.env.NODE_ENV);
-const log = new (require("./logger/Logger"))("app.js"); 
-const loggerMiddleware = require("./logger/loggerMiddleware");
+const { initLogger } = require("./logger/winstonLogger"); 
+initLogger(process.env.NODE_ENV); // Initializes Winston logging
+const log = new (require("./logger/Logger"))("app.js"); // Create logging object for app.js
+const loggerMiddleware = require("./logger/loggerMiddleware"); // Logging middleware
 
+// Localization middleware
 const createLocMiddleware = require("./localizations/createLocalizationMiddleware");
 
 const app = require("express")();

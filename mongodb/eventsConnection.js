@@ -4,7 +4,11 @@ const log = new (require("../logger/Logger"))("eventsConnection.js");
 let connection; 
 let clientRef; 
 
+/**
+ * Functions related to MongoDb events connection
+ */
 module.exports = {
+    // Inits database connection
     async init(eventDb) {
         if(!connection) {
             try {
@@ -29,7 +33,9 @@ module.exports = {
         }
     },
 
-
+    /**
+     * Returns connection to database. Used for querying events.
+     */
     getConnection() {
         if(!connection) {
             throw new Error("Error: getConnection() eventsConnection hasn't been initialized!"); 
@@ -38,6 +44,9 @@ module.exports = {
         return connection; 
     }, 
 
+    /**
+     * Closes connection to database
+     */
     closeConnection() {
         if(!connection) {
             throw new Error("Error: closeConnection() eventsConnection hasn't been initialized!"); 
@@ -46,6 +55,9 @@ module.exports = {
         clientRef.close(() => log.log("closeConnection","eventsConnection closed")); 
     },
 
+    /**
+     * Returns database client. Used for closing connection to MongoDb client
+     */
     getClient() {
         if(!connection) {
             throw new Error("Error: getClient() eventsConnection hasn't been initialized!"); 

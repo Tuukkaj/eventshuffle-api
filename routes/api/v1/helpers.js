@@ -1,9 +1,17 @@
+/**
+ * Checks is given date string is valid date
+ * @param {String} dateString Date string to check
+ */
 exports.isValidDate = function (dateString) {
     let date = new Date(dateString); 
 
     return date instanceof Date && !isNaN(date);
 }
 
+/**
+ * Replaces _id property with id property in object
+ * @param {MongoObject} mongoObject Object to replace _id properrty with id
+ */
 exports.replaceMongoIdProperty = function(mongoObject) {
     if(!mongoObject.hasOwnProperty("_id")) {
         throw new Error("Given object doesn't have _id property"); 
@@ -19,6 +27,10 @@ exports.replaceMongoIdProperty = function(mongoObject) {
     return mongoObject; 
 }
 
+/**
+ * Unifies given date string to same format (yyyy-mm-dd).
+ * @param {String} dateString Date string to unify
+ */
 exports.unifyDateString = function(dateString) {
     const dObject = new Date(dateString);
 
