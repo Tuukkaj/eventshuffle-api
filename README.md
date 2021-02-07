@@ -108,6 +108,9 @@ NODE_ENV=development // Enviroment. If 'development' logging will be done to con
 TEST_ENV_DROP_DB_AFTER_TEST=true // If 'true' and NODE_ENV is 'development', test database will be droppped after tests are executed. 
 
 LOG_LEVEL=3 // 3=DEBUG, 2=LOG, 1=WARNING, 0=ERROR
+LOG_TYPE=2 // 0=FILE, 1=CONSOLE, 3=BOTH
+LOG_PATH_ALL=logs/all.log
+LOG_PATH_ERROR=logs/error.log
 ````
 
 After this application should be ready to run!
