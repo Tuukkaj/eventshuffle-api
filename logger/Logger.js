@@ -1,3 +1,4 @@
+const  logLevels = require("./logLevels");
 const getTime = require("./time"); 
 const {logger : winston} = require("./winstonLogger");
 
@@ -13,21 +14,29 @@ module.exports = function Logger(fileName) {
 
     // Debugging log
     this.debug = function(funcName, text) {
-      winston.debug(`${createInfoText()}[${funcName}]: ${text}`);
+      if(process.env.LOG_LEVEL >= logLevels.DEBUG) {
+        winston.debug(`${createInfoText()}[${funcName}]: ${text}`);
+      }
     }
 
     // Log / info 
     this.log = function(funcName, text) {
-      winston.info(`${createInfoText()}[${funcName}]: ${text}`);
+      if(process.env.LOG_LEVEL >= logLevels.LOG) {
+        winston.info(`${createInfoText()}[${funcName}]: ${text}`);
+      }
     }
 
     // Warning logs
     this.warn = function(funcName, text) {
-      winston.warn(`${createInfoText()}[${funcName}]: ${text}`);
+      if(process.env.LOG_LEVEL >= logLevels.WARNING) {
+        winston.warn(`${createInfoText()}[${funcName}]: ${text}`);
+      }
     }
 
     // Error logs
     this.error = function(funcName, text) {
-      winston.error(`${createInfoText()}[${funcName}]: ${text}`);
+      if(process.env.LOG_LEVEL >= logLevels.ERROR) {
+        winston.error(`${createInfoText()}[${funcName}]: ${text}`);
+      }
     }
 }
