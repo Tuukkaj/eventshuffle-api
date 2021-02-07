@@ -1,8 +1,6 @@
 let app; 
 let eventRequests; 
 
-const { ObjectId } = require("mongodb");
-
 const chai = require("chai"); 
 const chaiHttp = require("chai-http"); 
 chai.should(); 
@@ -24,7 +22,7 @@ before(function(done) {
     // Run after main application has started
     const onAppLoaded = startedApp => {
         app = startedApp;
-        eventRequests = new (require("./EventsRequests"))(app, URL);
+        eventRequests = new (require("./EventRequests"))(app, URL);
         done();
     }
 
