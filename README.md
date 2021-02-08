@@ -103,7 +103,7 @@ MONGO_DB_TEST_EVENTS_DATABASE=testEventsDatabase // Unit test database
 
 EXPRESS_PORT=3000 // Port of Events API
 
-NODE_ENV=development // Enviroment. If 'development' logging will be done to console. If 'production' logging will be done to /logs folder.
+NODE_ENV=development // Enviroment
 
 TEST_ENV_DROP_DB_AFTER_TEST=true // If 'true' and NODE_ENV is 'development', test database will be droppped after tests are executed. 
 
